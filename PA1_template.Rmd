@@ -56,11 +56,7 @@ plot.ts(x=ttsteps2$interval,y=ttsteps2$m_steps,type="l",xlab="Interval",ylab="Me
 Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 ```{r,echo=TRUE}
-fun <- function(x){
-     if(is.numeric(x)){max(x,na.rm = 1)}
-     else{max(as.character(x),na.rm=1)}
- }
-colwise(fun)(ttsteps2)
+ttsteps2[which.max(ttsteps2$m_steps),]
 ```
 
 **Imputing missing values**
