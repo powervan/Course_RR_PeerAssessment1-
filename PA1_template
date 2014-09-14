@@ -1,0 +1,81 @@
+Assignment One
+========================================================
+
+Data about personal movement **Fitbit**, **Nike Fuelband**, or **Jawbone Up**.
+
+Analysis statistics.
+
+Loading data.
+
+```{r, echo=TRUE}
+require(lubridate)
+require(plyr)
+data<- read.csv(unzip("repdata_data_activity.zip"))
+summary(data)
+data$date<-ymd(data$date)
+data<-mutate(data, day=day(date))
+```
+
+**What is mean total number of steps taken per day?**
+
+```{r, echo=TRUE}
+require(plyr)
+
+ttsteps<-ddply(data,.(day),summarise, t_steps=sum(steps,na.rm=T), m_steps=mean(steps,na.rm=T))
+
+ttsteps1<-ddply(data,.(day,interval),summarise, t_steps=sum(steps,na.rm=T), m_steps=mean(steps,na.rm=T))
+
+ttsteps2<-ddply(ttsteps1,.(interval),summarise, t_steps=sum(t_steps,na.rm=T), m_steps=mean(m_steps,na.rm=T))
+
+mean(ttsteps$t_steps,na.rm=T)
+```
+Histogram
+```{r,echo=TRUE}
+hist(ttsteps$t_steps, xlab="total number of steps",main="Number of steps for day")
+```
+
+Mean 
+
+```{r,echo=TRUE}
+mean(ttsteps$t_steps,na.rm=T)
+```
+Median
+```{r,echo=TRUE}
+median(ttsteps$t_steps,na.rm=T)
+```
+
+
+**What is the average daily activity pattern?**  
+Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+
+```{r,echo=TRUE}
+plot.ts(x=ttsteps2$interval,y=ttsteps2$m_steps,type="l",xlab="Interval",ylab="Mean steps per day",main="Average daily activity pattern")
+
+```
+
+Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+
+```{r,echo=TRUE}
+fun <- function(x){
+     if(is.numeric(x)){max(x,na.rm = 1)}
+     else{max(as.character(x),na.rm=1)}
+ }
+colwise(fun)(ttsteps2)
+```
+
+**Imputing missing values**
+
+Note that there are a number of days/intervals where there are missing values (coded as NA). The presence of missing days may introduce bias into some calculations or summaries of the data.
+
+Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
+
+```{r,echo=TRUE}
+summary(data)
+```
+
+
+Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+
+Create a new dataset that is equal to the original dataset but with the missing data filled in.
+
+Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?.
